@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Exam Prep — self-tests</title>
+  <style>
+    body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { font-size: 1.2rem; }
+    .summary { font-weight: 700; margin: 1rem 0; }
+    ul { list-style: none; padding: 0; }
+    li { padding: .35rem .5rem; border-bottom: 1px solid #eee; font-size: .92rem; }
+    .pass { color: #166534; }
+    .fail { color: #991b1b; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <h1>Exam Prep — self-tests</h1>
+  <div class="summary" id="summary">Running…</div>
+  <ul id="results"></ul>
+
+  <script type="module">
+    import { parseCSV } from '../csv.js';
+    import { rowsToQuestions, buildSession, gradeSession, isQuestionCorrect, shuffle, correctIndices } from '../quiz.js';
+
+    const results = [];
+    const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+    function check(name, cond) { results.push({ name, ok: !!cond }); }
+
+    // ---- CSV parser ----
+    const csv = parseCSV('a,b,c\n1,"hello, world","line\nbreak"\n"quote ""x"" here",,z\n');
+    check('CSV: row count', csv.length === 3);
+    check('CSV: simple header', eq(csv[0], ['a', 'b', 'c']));
+    check('CSV: comma inside quotes', csv[1][1] === 'hello, world');
+    check('CSV: newline inside quotes', csv[1][2] === 'line\nbreak');
+    check('CSV: escaped quotes', csv[2][0] === 'quote "x" here');
+    check('CSV: empty field preserved', csv[2][1] === '');
+    check('CSV: no phantom trailing row', parseCSV('a,b\n').length === 1);
+    check('CSV: CRLF handled', eq(parseCSV('a,b\r\nc,d'), [['a', 'b'], ['c', 'd']]));
+
+    // ---- Sample-shaped data ----
+    const SAMPLE = [
+      'Number,Question,Answer,Explanation,Correct',
+      '1,"What is 2 + 2?",3,,',
+      ',,4,"Because 2 + 2 = 4, as expected",x',
+      ',,5,,',
+      ',,22,,',
+      '2,"Pick the even numbers",One,,',
+      ',,Two,,x',
+      ',,Three,"odd",',
+      ',,Four,,x',
+      '',                       // blank separator row, should be skipped
+      '3,"Capital of France?",Paris,"since 987 AD",x',
+      ',,London,,',
+      ',,Berlin,,',
+    ].join('\n');
+
+    const qs = rowsToQuestions(parseCSV(SAMPLE));
+    check('Parse: header row skipped → 3 questions', qs.length === 3);
+    check('Parse: Q1 text', qs[0].text === 'What is 2 + 2?');
+    check('Parse: Q1 has 4 options', qs[0].options.length === 4);
+    check('Parse: Q1 first row option captured', qs[0].options[0].text === '3');
+    check('Parse: Q1 single correct option = "4"', eq(qs[0].options.filter(o => o.correct).map(o => o.text), ['4']));
+    check('Parse: Q1 explanation from option row', qs[0].explanation === 'Because 2 + 2 = 4, as expected');
+    check('Parse: Q2 multi-correct = Two & Four', eq(qs[1].options.filter(o => o.correct).map(o => o.text).sort(), ['Four', 'Two']));
+    check('Parse: Q3 reached after blank row', qs[2].text === 'Capital of France?');
+
+    // A correct-marker column with stray prose must NOT count as a marker.
+    const tricky = rowsToQuestions(parseCSV('1,Q,OptA,,\n,,OptB,,mixed'));
+    check('Parse: prose ("mixed") is not a correct marker', correctIndices(tricky[0]).length === 0);
+
+    // ---- shuffle ----
+    const base = [1, 2, 3, 4, 5, 6, 7, 8];
+    const sh = shuffle(base);
+    check('shuffle: same multiset', eq([...sh].sort((a, b) => a - b), base));
+    check('shuffle: does not mutate input', eq(base, [1, 2, 3, 4, 5, 6, 7, 8]));
+
+    // ---- buildSession ----
+    const sess = buildSession(qs, 2);
+    check('buildSession: respects count', sess.length === 2);
+    check('buildSession: clamps over-count to total', buildSession(qs, 999).length === 3);
+    check('buildSession: clamps under-count to 1', buildSession(qs, 0).length === 1);
+    check('buildSession: multi flag set for multi-correct', buildSession([qs[1]], 1)[0].multi === true);
+    check('buildSession: multi flag false for single-correct', buildSession([qs[0]], 1)[0].multi === false);
+
+    // ---- grading (exact-match, no partial credit) ----
+    function makeQ(correctIdx, selected) {
+      const options = [0, 1, 2, 3].map(i => ({ text: 'o' + i, correct: correctIdx.includes(i) }));
+      return { text: 'q', options, explanation: '', multi: correctIdx.length > 1, selected };
+    }
+    check('grade: single correct', isQuestionCorrect(makeQ([2], [2])) === true);
+    check('grade: single wrong', isQuestionCorrect(makeQ([2], [1])) === false);
+    check('grade: multi exact match', isQuestionCorrect(makeQ([0, 2], [2, 0])) === true);
+    check('grade: multi partial = wrong', isQuestionCorrect(makeQ([0, 2], [0])) === false);
+    check('grade: multi extra pick = wrong', isQuestionCorrect(makeQ([0, 2], [0, 2, 3])) === false);
+
+    const graded = gradeSession([
+      makeQ([1], [1]),       // correct
+      makeQ([0, 2], [0]),    // wrong (partial)
+      makeQ([3], []),        // unanswered
+    ]);
+    check('gradeSession: correct count', graded.correct === 1);
+    check('gradeSession: wrong count', graded.wrong === 1);
+    check('gradeSession: unanswered count', graded.unanswered === 1);
+    check('gradeSession: percent rounded', graded.percent === 33);
+
+    // ---- render ----
+    const ul = document.getElementById('results');
+    let passed = 0;
+    for (const r of results) {
+      const li = document.createElement('li');
+      li.className = r.ok ? 'pass' : 'fail';
+      li.textContent = `${r.ok ? '✓ PASS' : '✗ FAIL'} — ${r.name}`;
+      ul.appendChild(li);
+      if (r.ok) passed++;
+    }
+    const all = results.length;
+    const summary = document.getElementById('summary');
+    summary.textContent = `${passed}/${all} passed` + (passed === all ? ' — all good ✅' : ' — SOME FAILED ❌');
+    summary.className = 'summary ' + (passed === all ? 'pass' : 'fail');
+    // expose for headless checks
+    window.__TEST_RESULT__ = { passed, all, failures: results.filter(r => !r.ok).map(r => r.name) };
+  </script>
+</body>
+</html>

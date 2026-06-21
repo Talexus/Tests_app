@@ -1,0 +1,10 @@
+[
+  {
+    "name": "Sample Exam (bundled, works offline)",
+    "url": "./sample-exam.csv"
+  },
+  {
+    "name": "Example — replace with your Google Sheet",
+    "url": "https://docs.google.com/spreadsheets/d/e/REPLACE_WITH_YOUR_PUBLISHED_ID/pub?output=csv"
+  }
+]

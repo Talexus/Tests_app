@@ -1,0 +1,23 @@
+Number,Question,Answer,Explanation,Correct
+1,"What is 2 + 2?",3,,
+,,4,"Because 2 + 2 = 4, as expected",x
+,,5,,
+,,22,,
+2,"Which of these are primary colors in the RYB model?",Red,,x
+,,Green,,
+,,Blue,"Blue is one of the three RYB primaries",x
+,,Yellow,,x
+,,Orange,"Orange is secondary, mixed from red and yellow",
+3,"What is the capital of France?",Paris,"Paris has been France's capital, on and off, since 987 AD",x
+,,London,,
+,,Berlin,,
+,,Madrid,,
+4,"Which planet is known as the Red Planet?",Venus,,
+,,Mars,"Iron oxide (rust) on the surface gives Mars its red color",x
+,,Jupiter,,
+,,Saturn,,
+5,"Select all even numbers.",One,,
+,,Two,,x
+,,Three,,
+,,Four,,x
+,,Six,,x

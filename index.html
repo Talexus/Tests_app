@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Exam Prep</title>
+  <meta name="description" content="Practice multiple-choice exam questions from your own published Google Sheets." />
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#4f46e5" />
+
+  <!-- iOS add-to-home-screen -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Exam Prep" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+
+  <link rel="icon" href="./icons/icon-192.png" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1 class="app-title">Exam&nbsp;Prep</h1>
+    <div class="timer" id="timer" hidden aria-live="off">
+      <span aria-hidden="true">⏱</span> <span id="timerText">00:00</span>
+    </div>
+  </header>
+
+  <main id="app">
+
+    <!-- ============== START ============== -->
+    <section id="screen-start" class="screen" hidden>
+      <div class="card">
+        <h2>Choose an exam</h2>
+        <label class="field-label" for="examSelect">Exam</label>
+        <select id="examSelect" class="select"></select>
+        <button id="loadExamBtn" class="btn btn-primary btn-block">Load exam</button>
+      </div>
+
+      <div class="card" id="historyPanel" hidden>
+        <div class="history-head">
+          <h2>Recent attempts</h2>
+          <button id="clearHistoryBtn" class="btn btn-ghost btn-small">Clear</button>
+        </div>
+        <ul id="historyList" class="history-list"></ul>
+      </div>
+    </section>
+
+    <!-- ============== LOADING ============== -->
+    <section id="screen-loading" class="screen" hidden>
+      <div class="card center">
+        <div class="spinner" role="status" aria-label="Loading"></div>
+        <p class="muted">Loading…</p>
+      </div>
+    </section>
+
+    <!-- ============== ERROR ============== -->
+    <section id="screen-error" class="screen" hidden>
+      <div class="card center">
+        <div class="error-icon" aria-hidden="true">⚠️</div>
+        <p id="errorMessage" class="error-message"></p>
+        <div class="row">
+          <button id="retryBtn" class="btn btn-primary">Try again</button>
+          <button id="errorBackBtn" class="btn btn-ghost">Back</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== SETUP ============== -->
+    <section id="screen-setup" class="screen" hidden>
+      <div class="card">
+        <h2 id="setupExamName">Exam</h2>
+        <p class="muted"><span id="totalAvail">0</span> questions available</p>
+
+        <label class="field-label" for="countInput">How many questions?</label>
+        <input id="countInput" class="input" type="number" inputmode="numeric" min="1" value="20" />
+
+        <div class="presets">
+          <button class="btn btn-chip preset" data-count="10">10</button>
+          <button class="btn btn-chip preset" data-count="20">20</button>
+          <button class="btn btn-chip preset" data-count="50">50</button>
+          <button class="btn btn-chip preset" data-count="all">All</button>
+        </div>
+
+        <button id="startBtn" class="btn btn-primary btn-block">Start practice</button>
+        <button id="setupBackBtn" class="btn btn-ghost btn-block">Back</button>
+      </div>
+    </section>
+
+    <!-- ============== QUIZ ============== -->
+    <section id="screen-quiz" class="screen" hidden>
+      <div class="card">
+        <p class="progress" id="progressText">Question 1 of 1</p>
+        <p class="question" id="questionText"></p>
+        <p class="multi-hint" id="multiHint"></p>
+        <div id="optionsForm" class="options"></div>
+      </div>
+
+      <div class="nav-bar">
+        <button id="prevBtn" class="btn btn-ghost">‹ Back</button>
+        <button id="nextBtn" class="btn btn-ghost">Forward ›</button>
+        <button id="submitBtn" class="btn btn-primary">Submit</button>
+      </div>
+    </section>
+
+    <!-- ============== STATS ============== -->
+    <section id="screen-stats" class="screen" hidden>
+      <div class="card center">
+        <h2>Results</h2>
+        <div class="score-big"><span id="statPercent">0%</span></div>
+        <p class="muted"><span id="statCorrect">0</span> / <span id="statTotal">0</span> correct</p>
+
+        <div class="stats-grid">
+          <div class="stat"><div class="stat-num" id="statWrong">0</div><div class="stat-label">Wrong</div></div>
+          <div class="stat"><div class="stat-num" id="statUnanswered">0</div><div class="stat-label">Unanswered</div></div>
+          <div class="stat"><div class="stat-num" id="statTime">0:00</div><div class="stat-label">Time</div></div>
+        </div>
+
+        <div class="row">
+          <button id="reviewBtn" class="btn btn-primary">Review answers</button>
+          <button id="newPracticeBtn" class="btn btn-ghost">New practice</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== REVIEW ============== -->
+    <section id="screen-review" class="screen" hidden>
+      <div class="review-toolbar">
+        <h2>Review</h2>
+        <div class="row">
+          <button id="reviewBackBtn" class="btn btn-ghost btn-small">Back to results</button>
+          <button id="reviewNewBtn" class="btn btn-primary btn-small">New practice</button>
+        </div>
+      </div>
+      <div id="reviewList" class="review-list"></div>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <span class="muted">Offline-ready · data stays on your device</span>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
