@@ -1,10 +1,18 @@
 [
   {
-    "name": "Sample Exam (bundled, works offline)",
-    "url": "./sample-exam.csv"
+    "name": "PMI-PMOCP",
+    "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGQHkzG0OfNh4LrQAIw9JSzIY4x3aFY_fMGzW_xCCvMC9wa6KMpPZClenJpomankveElepsb7_AojC/pub?gid=0&single=true&output=csv"
   },
   {
-    "name": "Example — replace with your Google Sheet",
-    "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGQHkzG0OfNh4LrQAIw9JSzIY4x3aFY_fMGzW_xCCvMC9wa6KMpPZClenJpomankveElepsb7_AojC/pub?gid=0&single=true&output=csv"
+    "name": "RMP",
+    "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGQHkzG0OfNh4LrQAIw9JSzIY4x3aFY_fMGzW_xCCvMC9wa6KMpPZClenJpomankveElepsb7_AojC/pub?gid=662259558&single=true&output=csv"
+  },
+  {
+    "name": "CAMP",
+    "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGQHkzG0OfNh4LrQAIw9JSzIY4x3aFY_fMGzW_xCCvMC9wa6KMpPZClenJpomankveElepsb7_AojC/pub?gid=751338043&single=true&output=csv"
+  },
+  {
+    "name": "CAMP",
+    "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGQHkzG0OfNh4LrQAIw9JSzIY4x3aFY_fMGzW_xCCvMC9wa6KMpPZClenJpomankveElepsb7_AojC/pub?gid=308373678&single=true&output=csv"
   }
 ]
